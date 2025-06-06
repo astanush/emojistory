@@ -3,47 +3,68 @@
 <head>
   <meta charset="UTF-8">
   <title>Emoji Story Cubes</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <style>
-    body {
-      background: #f2f5fa;
-      font-family: 'Segoe UI', Arial, sans-serif;
-      text-align: center;
+    html, body {
+      height: 100%;
       margin: 0;
       padding: 0;
+      background: #f2f5fa;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 0;
+      margin: 0;
     }
     h1 {
-      margin-top: 2rem;
-      font-size: 2.2rem;
+      font-size: 1.4rem;
+      margin-top: 1.1rem;
+      margin-bottom: 0.4rem;
       letter-spacing: 2px;
-      color: #2d3a4b;
+      color: #285388;
+      font-weight: 700;
     }
     .grid {
       display: grid;
-      grid-template-columns: repeat(3, 82px);
-      grid-gap: 18px;
+      grid-template-columns: repeat(3, 20vw);
+      grid-gap: 3vw;
       justify-content: center;
-      margin: 2rem auto 1rem auto;
-      width: max-content;
+      align-items: center;
+      margin: 2.2vw auto 1.5vw auto;
       background: #dde7f1;
-      padding: 20px;
-      border-radius: 1.5rem;
-      box-shadow: 0 6px 32px #a3bed6aa;
+      padding: 3vw;
+      border-radius: 2.2vw;
+      box-shadow: 0 4px 32px #a3bed6aa;
+      width: max-content;
+      max-width: 98vw;
+      min-width: 63vw;
     }
     .tile-flip {
-      perspective: 600px;
+      perspective: 700px;
     }
     .tile-inner {
-      width: 82px;
-      height: 82px;
-      border-radius: 1.1rem;
+      width: 20vw;
+      height: 20vw;
+      max-width: 120px;
+      max-height: 120px;
+      min-width: 70px;
+      min-height: 70px;
+      border-radius: 1.5vw;
       position: relative;
-      transition: transform 0.5s;
+      transition: transform 0.48s cubic-bezier(0.5,0.2,0.1,1.05);
       transform-style: preserve-3d;
       will-change: transform;
-      box-shadow: 0 2px 10px #d1dbec99;
-      border: 2px solid #c0d3e5;
+      box-shadow: 0 1.5px 7px #d1dbec99;
+      border: 1.5px solid #c0d3e5;
       background: transparent;
+      touch-action: none;
+      user-select: none;
     }
     .tile-flip.flipped .tile-inner {
       transform: rotateY(180deg);
@@ -55,28 +76,31 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 2.6rem;
-      border-radius: 1.1rem;
-      background: linear-gradient(135deg, #fff 70%, #e6f0fa 100%);
+      font-size: 9vw;
+      max-font-size: 80px;
+      min-font-size: 38px;
+      border-radius: 1.2vw;
+      background: linear-gradient(135deg, #fff 75%, #e6f0fa 100%);
       box-shadow: 0 2px 10px #d1dbec99;
       backface-visibility: hidden;
+      user-select: none;
     }
     .tile-back {
       transform: rotateY(180deg);
-      background: linear-gradient(135deg, #cfe3fb 70%, #dde7f1 100%);
-      color: #c0d3e5;
-      font-size: 1.7rem;
+      background: linear-gradient(135deg, #b0cced 70%, #dde7f1 100%);
+      color: #a2bed8;
+      font-size: 4vw;
       letter-spacing: 2px;
     }
     .chapter-label {
       grid-column: 1 / 4;
       text-align: left;
-      font-size: 1rem;
-      color: #697b95;
-      margin-top: 10px;
-      margin-bottom: -6px;
+      font-size: 1.05rem;
+      color: #487cc7;
+      margin-top: 3px;
+      margin-bottom: -10px;
       padding-left: 5px;
-      font-weight: 500;
+      font-weight: 600;
       letter-spacing: 1px;
       background: none;
       border: none;
@@ -85,33 +109,80 @@
       user-select: none;
     }
     .button-row {
-      margin-top: 1rem;
-      margin-bottom: 2rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1.6vw;
+      margin-top: 2vw;
+      margin-bottom: 1.3rem;
     }
     button {
-      font-size: 1.12rem;
-      padding: 0.6rem 1.4rem;
-      margin: 0 0.7rem;
+      font-size: 1.13rem;
+      padding: 0.78rem 2.2rem;
       border-radius: 2rem;
       border: none;
-      background: linear-gradient(90deg, #77aaff, #3a7bd5 90%);
+      background: linear-gradient(90deg, #2b74e4, #52aaff 90%);
       color: #fff;
       cursor: pointer;
       box-shadow: 0 2px 12px #c6e1ff55;
-      font-weight: 600;
-      letter-spacing: 1px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
       transition: background 0.2s, box-shadow 0.2s;
+      margin: 0;
+      min-width: 120px;
+      min-height: 46px;
+      outline: none;
+      -webkit-tap-highlight-color: transparent;
     }
-    button:hover {
-      background: linear-gradient(90deg, #3a7bd5, #77aaff 90%);
-      box-shadow: 0 2px 18px #b7d4fb80;
+    button:active {
+      background: linear-gradient(90deg, #3063bc, #7cc5fa 90%);
+      box-shadow: 0 2px 15px #8ec9fd99;
     }
-    @media (max-width: 600px) {
-      .grid { grid-template-columns: repeat(3, 54px); padding: 12px; }
-      .tile-inner, .tile-flip { width: 54px; height: 54px; }
-      .tile-face, .tile-back { font-size: 1.5rem; }
-      h1 { font-size: 1.3rem; }
-      button { font-size: 0.95rem; padding: 0.5rem 1.1rem; }
+    button:disabled {
+      background: #b3c6dd;
+      color: #eef1f5;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    .hint {
+      color:#6987ad;
+      font-size:1rem;
+      margin-bottom:2vw;
+      padding:0 10vw;
+      font-weight: 400;
+      letter-spacing: 0.5px;
+    }
+    @media (max-width: 700px) {
+      h1 { font-size: 1.05rem; }
+      .grid {
+        grid-template-columns: repeat(3, 28vw);
+        min-width: 84vw;
+        padding: 2.5vw;
+      }
+      .tile-inner, .tile-flip {
+        min-width: 54px;
+        min-height: 54px;
+        width: 28vw;
+        height: 28vw;
+      }
+      .tile-face { font-size: 13vw; }
+      button { font-size: 1.01rem; padding: 0.6rem 1.3rem; min-width:90px; min-height:36px; }
+      .button-row { gap: 3vw; }
+      .hint { font-size: .92rem; }
+    }
+    @media (max-width: 420px) {
+      .grid { grid-template-columns: repeat(3, 31vw); }
+      .tile-inner, .tile-flip {
+        width: 31vw;
+        height: 31vw;
+        min-width: 44px;
+        min-height: 44px;
+      }
+      .tile-face { font-size: 16vw; }
+    }
+    /* Remove highlight on tap for a more app-like feel */
+    button, .tile-inner, .tile-flip {
+      -webkit-tap-highlight-color: transparent;
     }
   </style>
 </head>
@@ -119,11 +190,11 @@
   <h1>Emoji Story Cubes 🎲</h1>
   <div id="emojiGrid" class="grid"></div>
   <div class="button-row">
-    <button id="rollBtn" onclick="rollStoryCubes()" style="z-index:1;">Roll Again</button>
+    <button id="rollBtn" onclick="rollStoryCubes()">Roll Again</button>
     <button onclick="copyEmojis()">Copy Emojis</button>
   </div>
-  <div style="color:#8397b1;font-size:1rem;">
-    <p>Tell a story using the emojis! Each row is a new chapter.<br>(Try “Roll Again” for new inspiration)</p>
+  <div class="hint">
+    Tell a story using the emojis! Each row is a new chapter.<br>(Tap “Roll Again” for new inspiration)
   </div>
 
   <script>
@@ -207,26 +278,23 @@
       // After each row, flip to front with new emoji
       for (let row = 0; row < 3; row++) {
         setTimeout(() => {
-          // Update emoji on front face
           for (let col = 0; col < 3; col++) {
             const idx = row * 3 + col;
             const tileFlip = gridDiv.querySelector(`.tile-flip[data-row="${row}"][data-idx="${idx}"]`);
             if (tileFlip) {
               // Update emoji on front face before unflipping
               tileFlip.querySelector('.tile-front').textContent = newGrid[idx];
-              // Unflip this tile
               tileFlip.classList.remove('flipped');
             }
           }
-        }, 400 + row * 330);
+        }, 380 + row * 320);
       }
 
-      // After animation is done, allow new rolls and set new state
       setTimeout(() => {
         flipping = false;
         currentStoryCubes = newGrid;
         document.getElementById('rollBtn').disabled = false;
-      }, 1450);
+      }, 1350);
     }
 
     function copyEmojis() {
