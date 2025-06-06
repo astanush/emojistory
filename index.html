@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Emoji Story Cubes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      background: #f2f5fa;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      margin-top: 2rem;
+      font-size: 2.2rem;
+      letter-spacing: 2px;
+      color: #2d3a4b;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 82px);
+      grid-gap: 18px;
+      justify-content: center;
+      margin: 2rem auto 1rem auto;
+      width: max-content;
+      background: #dde7f1;
+      padding: 20px;
+      border-radius: 1.5rem;
+      box-shadow: 0 6px 32px #a3bed6aa;
+    }
+    .tile-flip {
+      perspective: 600px;
+    }
+    .tile-inner {
+      width: 82px;
+      height: 82px;
+      border-radius: 1.1rem;
+      position: relative;
+      transition: transform 0.5s;
+      transform-style: preserve-3d;
+      will-change: transform;
+      box-shadow: 0 2px 10px #d1dbec99;
+      border: 2px solid #c0d3e5;
+      background: transparent;
+    }
+    .tile-flip.flipped .tile-inner {
+      transform: rotateY(180deg);
+    }
+    .tile-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.6rem;
+      border-radius: 1.1rem;
+      background: linear-gradient(135deg, #fff 70%, #e6f0fa 100%);
+      box-shadow: 0 2px 10px #d1dbec99;
+      backface-visibility: hidden;
+    }
+    .tile-back {
+      transform: rotateY(180deg);
+      background: linear-gradient(135deg, #cfe3fb 70%, #dde7f1 100%);
+      color: #c0d3e5;
+      font-size: 1.7rem;
+      letter-spacing: 2px;
+    }
+    .chapter-label {
+      grid-column: 1 / 4;
+      text-align: left;
+      font-size: 1rem;
+      color: #697b95;
+      margin-top: 10px;
+      margin-bottom: -6px;
+      padding-left: 5px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      background: none;
+      border: none;
+      outline: none;
+      pointer-events: none;
+      user-select: none;
+    }
+    .button-row {
+      margin-top: 1rem;
+      margin-bottom: 2rem;
+    }
+    button {
+      font-size: 1.12rem;
+      padding: 0.6rem 1.4rem;
+      margin: 0 0.7rem;
+      border-radius: 2rem;
+      border: none;
+      background: linear-gradient(90deg, #77aaff, #3a7bd5 90%);
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 2px 12px #c6e1ff55;
+      font-weight: 600;
+      letter-spacing: 1px;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    button:hover {
+      background: linear-gradient(90deg, #3a7bd5, #77aaff 90%);
+      box-shadow: 0 2px 18px #b7d4fb80;
+    }
+    @media (max-width: 600px) {
+      .grid { grid-template-columns: repeat(3, 54px); padding: 12px; }
+      .tile-inner, .tile-flip { width: 54px; height: 54px; }
+      .tile-face, .tile-back { font-size: 1.5rem; }
+      h1 { font-size: 1.3rem; }
+      button { font-size: 0.95rem; padding: 0.5rem 1.1rem; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Emoji Story Cubes 🎲</h1>
+  <div id="emojiGrid" class="grid"></div>
+  <div class="button-row">
+    <button id="rollBtn" onclick="rollStoryCubes()" style="z-index:1;">Roll Again</button>
+    <button onclick="copyEmojis()">Copy Emojis</button>
+  </div>
+  <div style="color:#8397b1;font-size:1rem;">
+    <p>Tell a story using the emojis! Each row is a new chapter.<br>(Try “Roll Again” for new inspiration)</p>
+  </div>
+
+  <script>
+    const EMOJIS = [
+      "😀","😢","😱","😡","😴","🤔","😍","🥳","🤗","😜","😭","😇","🤩","😏","😬","😤","🤪","😮‍💨","😶‍🌫️","😈",
+      "🐶","🦁","🦉","🐟","🦊","🐸","🐘","🦖","🦄","🐒","🦋","🐢",
+      "🗝️","🕰️","🎒","📚","🔑","🔦","🖊️","📷","🧸","🪁","🪀","🛎️",
+      "🌧️","☀️","🌪️","🌈","🌙","🌻","🍂","🌲","🌊","🌋",
+      "🚗","🚲","🚀","🚂","🚁","🚤","🚜","🛴","🛸",
+      "🏠","🏞️","🏫","🏕️","🏰","🏟️","🏝️","🏥",
+      "🐉","🧙‍♂️","🧚‍♀️","🧛‍♂️","🧞‍♂️","🧜‍♀️","🦸‍♂️","🦹‍♀️",
+      "🍎","🍕","🍦","🍔","🍉","🍩","🍪","🧃","🍓","🍟"
+    ];
+
+    let currentStoryCubes = [];
+    let flipping = false;
+
+    function randomGrid() {
+      let set = [...EMOJIS];
+      let grid = [];
+      for (let i = 0; i < 9; i++) {
+        let idx = Math.floor(Math.random() * set.length);
+        grid.push(set.splice(idx, 1)[0]);
+      }
+      return grid;
+    }
+
+    function renderGrid(grid, showBack = false) {
+      const gridDiv = document.getElementById("emojiGrid");
+      gridDiv.innerHTML = "";
+      for (let row = 0; row < 3; row++) {
+        // Chapter label
+        const label = document.createElement("div");
+        label.className = "chapter-label";
+        label.textContent = "Chapter " + (row + 1);
+        gridDiv.appendChild(label);
+        for (let col = 0; col < 3; col++) {
+          const idx = row * 3 + col;
+          const tileFlip = document.createElement("div");
+          tileFlip.className = "tile-flip";
+          if (showBack) tileFlip.classList.add("flipped");
+          tileFlip.dataset.row = row;
+          tileFlip.dataset.idx = idx;
+
+          // Inner for flipping faces
+          const tileInner = document.createElement("div");
+          tileInner.className = "tile-inner";
+
+          // Front face
+          const tileFront = document.createElement("div");
+          tileFront.className = "tile-face tile-front";
+          tileFront.textContent = grid[idx];
+
+          // Back face (shows a generic "?" or old emoji)
+          const tileBack = document.createElement("div");
+          tileBack.className = "tile-face tile-back";
+          tileBack.textContent = "🎲";
+
+          tileInner.appendChild(tileFront);
+          tileInner.appendChild(tileBack);
+          tileFlip.appendChild(tileInner);
+          gridDiv.appendChild(tileFlip);
+        }
+      }
+    }
+
+    function rollStoryCubes() {
+      if (flipping) return;
+      flipping = true;
+      document.getElementById('rollBtn').disabled = true;
+
+      // Stage 1: Flip all to back
+      const gridDiv = document.getElementById("emojiGrid");
+      const tiles = [...gridDiv.querySelectorAll('.tile-flip')];
+      for (let i = 0; i < tiles.length; i++) {
+        tiles[i].classList.add('flipped');
+      }
+
+      // Prepare new grid to flip to
+      const newGrid = randomGrid();
+      // After each row, flip to front with new emoji
+      for (let row = 0; row < 3; row++) {
+        setTimeout(() => {
+          // Update emoji on front face
+          for (let col = 0; col < 3; col++) {
+            const idx = row * 3 + col;
+            const tileFlip = gridDiv.querySelector(`.tile-flip[data-row="${row}"][data-idx="${idx}"]`);
+            if (tileFlip) {
+              // Update emoji on front face before unflipping
+              tileFlip.querySelector('.tile-front').textContent = newGrid[idx];
+              // Unflip this tile
+              tileFlip.classList.remove('flipped');
+            }
+          }
+        }, 400 + row * 330);
+      }
+
+      // After animation is done, allow new rolls and set new state
+      setTimeout(() => {
+        flipping = false;
+        currentStoryCubes = newGrid;
+        document.getElementById('rollBtn').disabled = false;
+      }, 1450);
+    }
+
+    function copyEmojis() {
+      const g = currentStoryCubes;
+      if (!g || g.length !== 9) return;
+      const text =
+        `Chapter 1: ${g.slice(0,3).join(" ")}\n` +
+        `Chapter 2: ${g.slice(3,6).join(" ")}\n` +
+        `Chapter 3: ${g.slice(6,9).join(" ")}`;
+      navigator.clipboard.writeText(text);
+      alert("Copied to clipboard!");
+    }
+
+    // First render on load
+    window.onload = function() {
+      currentStoryCubes = randomGrid();
+      renderGrid(currentStoryCubes);
+    };
+  </script>
+</body>
+</html>
